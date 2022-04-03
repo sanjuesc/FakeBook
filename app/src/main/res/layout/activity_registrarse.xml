@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".login">
+    tools:context=".registrarse">
 
     <Button
-        android:id="@+id/botonLogin"
+        android:id="@+id/crearCuenta"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="20dp"
-        android:onClick="comprobarCredenciales"
-        android:text="@string/iniciar_sesion"
+        android:onClick="registrarse"
+        android:text="@string/registrarse"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,19 +46,5 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextUsuario" />
 
 
-    <Button
-        android:id="@+id/botonRegistrarse"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="277dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="20dp"
-        android:onClick="abrirRegistrarse"
-        android:text="@string/no_tienes_cuenta"
-        android:textAllCaps="false"
-        android:textColor="@android:color/tab_indicator_text"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/botonLogin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
