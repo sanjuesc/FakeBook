@@ -18,10 +18,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class login extends AppCompatActivity {
-
+    String token;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +51,7 @@ public class login extends AppCompatActivity {
                         return;
                     }
                     // Get new FCM registration token
-                    String token = task.getResult();
+                    token = task.getResult();
                     // Log and toast
                     Log.d("yoyo", token);
                     Toast.makeText(getApplicationContext(), token, Toast.LENGTH_SHORT).show();
@@ -59,7 +66,15 @@ public class login extends AppCompatActivity {
         String usuario = textUsuario.getText().toString();
         EditText textContraseña = findViewById(R.id.editTextPassword);
         String contra = textContraseña.getText().toString(); //obtenemos el usuario y la contraseña introducidas
+        if(enviar(usuario, contra)){
+            Intent i = new Intent(login.this, menu_principal.class);
+            i.putExtra("usuario", usuario);
+            finish(); //cerramos esta actividad
+            startActivity(i); //y empezamos la nueva
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
+
+        }
     }
 
     @Override
@@ -102,7 +117,33 @@ public class login extends AppCompatActivity {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); //y cambiamos la animacion con la que se abre
     }
 
+    public Boolean enviar(String usuario, String contra) throws ExecutionException, InterruptedException {
 
+
+        Callable<Boolean> callable = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                URL url = new URL("http://sanjuesc.xyz:8888/user/login");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type","application/json");
+                connection.setRequestProperty("Accept", "application/json");
+                String payload = "{\"usuario\":\""+usuario+"\", \"pass\":\""+contra+"\", \"registrationToken\":\""+token+"\"}";// This should be your json body i.e. {"Name" : "Mohsin"}
+                Log.d("aaa", payload);
+                byte[] out = payload.getBytes(StandardCharsets.UTF_8);
+                OutputStream stream = connection.getOutputStream();
+                stream.write(out);
+                Log.d("aaa",connection.getResponseCode() + " " + connection.getResponseMessage()); // THis is optional
+                connection.disconnect();
+                return connection.getResponseCode()==200;
+            }
+        };
+
+        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable);
+
+        return future.get();
+    }
 
 
 }

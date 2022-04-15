@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -81,29 +82,42 @@ public class registrarse extends AppCompatActivity {
 
         EditText textContra = (EditText)findViewById(R.id.editTextPassword);
         String contra = textContra.getText().toString();
-        enviar();
+        boolean exito=enviar(usuario, contra);
+
+        Context context = getApplicationContext();
+        CharSequence text;
+        if(exito){
+            text = "Usuario creado correctamente";
+        }else{
+            text = "No se ha podido crear el usuario";
+        }
+
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
 
     }
-    public Boolean enviar() throws ExecutionException, InterruptedException {
+    public Boolean enviar(String usuario, String contra) throws ExecutionException, InterruptedException {
 
 
         Callable<Boolean> callable = new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                URL url = new URL("PONER URL");
+                URL url = new URL("http://sanjuesc.xyz:8888/user/add");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("PUT");
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type","application/json");
                 connection.setRequestProperty("Accept", "application/json");
-                String payload = "{\"usuario\":\"samplasdfsdsdaadValue\", \"pass\":\"pasdsadsaass\", \"registrationToken\":\"asdsadasda\"}";// This should be your json body i.e. {"Name" : "Mohsin"}
+                String payload = "{\"usuario\":\""+usuario+"\", \"pass\":\""+contra+"\"}";// This should be your json body i.e. {"Name" : "Mohsin"}
                 Log.d("aaa", payload);
                 byte[] out = payload.getBytes(StandardCharsets.UTF_8);
                 OutputStream stream = connection.getOutputStream();
                 stream.write(out);
                 Log.d("aaa",connection.getResponseCode() + " " + connection.getResponseMessage()); // THis is optional
                 connection.disconnect();
-                return null;
+                return connection.getResponseCode()==200;
             }
         };
 

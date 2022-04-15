@@ -7,7 +7,6 @@
     android:fitsSystemWindows="false"
     tools:context=".menu_principal" >
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -18,6 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -53,6 +54,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/baseline_settings_24"
         android:onClick="abrirPreferencias"/>
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
