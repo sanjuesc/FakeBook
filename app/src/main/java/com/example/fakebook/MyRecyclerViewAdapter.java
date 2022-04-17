@@ -2,7 +2,7 @@ package com.example.fakebook;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,18 +11,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
@@ -48,10 +38,13 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public void onBindViewHolder(ViewHolder holder, int position) {
         elemento actual = mData.get(position);
         holder.myTextView.setText(actual.autor);
-
+        holder.fecha.setText(actual.fecha);
+        holder.hora.setText(actual.hora);
         try{
-            cargarImagen(actual.uri, holder.myImageView);
+            cargarImagen(actual.uri, holder.myImageView, position);
+
         }catch (Exception e){
+
             e.printStackTrace();
         }
 
@@ -68,10 +61,14 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView myTextView;
         ImageView myImageView;
+        TextView fecha;
+        TextView hora;
         ViewHolder(View itemView) {
             super(itemView);
             myTextView = itemView.findViewById(R.id.info_text);
             myImageView= itemView.findViewById(R.id.imageView2);
+            fecha = itemView.findViewById(R.id.textFecha);
+            hora = itemView.findViewById(R.id.textHora);
             itemView.setOnClickListener(this);
         }
 
@@ -97,24 +94,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
 
 
-    public Boolean cargarImagen(String nombre, ImageView imageView) throws ExecutionException, InterruptedException { //FUNCIONAAAAAAAAAAAAAAAA
+    public void cargarImagen(String nombre, ImageView imageView, int posicion) throws ExecutionException, InterruptedException { //FUNCIONAAAAAAAAAAAAAAAA
+        Bitmap bmp = MisBitmaps.getInstance().getArray().get(posicion);
+        imageView.setImageBitmap(bmp);
 
-
-        Callable<Boolean> callable = new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-
-                URL url = new URL("http://sanjuesc.xyz/algo/"+nombre+".jpg");
-                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                imageView.setImageBitmap(bmp);
-
-                return true;
-            }
-        };
-
-        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable);
-
-        return future.get();
     }
 
 

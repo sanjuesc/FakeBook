@@ -1,13 +1,12 @@
 package com.example.fakebook;
 
 import android.Manifest;
-import android.app.Application;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -18,54 +17,32 @@ import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.util.Hex;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import okhttp3.*;
-import okhttp3.internal.http.StatusLine;
 
 public class menu_principal extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener {
     private final OkHttpClient httpClient = new OkHttpClient();
@@ -131,10 +108,13 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
 
     private void cargarFotos() {
         try {
+            MisBitmaps.getInstance().getArray().removeAll(MisBitmaps.getInstance().getArray());
             String[] fotos = getLista();
 
             for(int i = 0; i<fotos.length; i++){
+
                 poblarLista(fotos[i]);
+                cargarBitmap(fotos[i]);
                 System.out.println(milista.size());
             }
 
@@ -148,10 +128,12 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
 
     private void recargarFotos(){
         try {
+            MisBitmaps.getInstance().getArray().removeAll(MisBitmaps.getInstance().getArray());
             milista.removeAll(milista);
             String[] fotos = getLista();
             for(int i = 0; i<fotos.length; i++){
                 poblarLista(fotos[i]);
+                cargarBitmap(fotos[i]);
                 System.out.println(milista.size());
             }
             adapter.notifyDataSetChanged();
@@ -161,6 +143,33 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
             e.printStackTrace();
         }
     }
+
+
+    @Override
+    public void onItemClick(View view, int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("");
+        builder.setMessage("Se abrira la posición de donde se ha tomado la foto");
+
+        builder.setPositiveButton(getString(R.string.aceptar), (dialogInterface, i) -> {
+            elemento actual = adapter.getItem(position);
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:"+actual.lati+","+actual.longi+"?q="+actual.lati+","+actual.longi));
+                startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancelar), (dialogInterface, i) -> {
+            //realmente no hay que hacer nada
+        });
+
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 
 
     public void nuevo(View view) {
@@ -270,6 +279,7 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
                 Log.d("enviarimagen", "enviarimagen");
                 enviarimagen(usuario, fotoen64, generarTitulo(),getFecha(), String.valueOf(longitude), String.valueOf(latitude));
                 recargarFotos();
+                enviarNoti();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -384,8 +394,9 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
 
                     jsonObject = new JSONObject(response.body().string().replace("[", "").replace("]", ""));
                     System.out.println(jsonObject);
-                    milista.add(new elemento(jsonObject.getString("nombre"), jsonObject.getString("user"), jsonObject.getString("lat"), jsonObject.getString("lon")));
+                    milista.add(new elemento(jsonObject.getString("nombre"), jsonObject.getString("user"), jsonObject.getString("lat"), jsonObject.getString("lon"), jsonObject.getString("fecha")));
                     return response.isSuccessful();
+
                 }
             }
         };
@@ -394,13 +405,6 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
 
         return future.get();
     }
-
-
-    @Override
-    public void onItemClick(View view, int position) {
-
-    }
-
 
 
     private Location getLastKnownLocation() {
@@ -421,4 +425,51 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
         }
         return bestLocation;
     }
+
+
+    public Boolean cargarBitmap(String nombre) throws ExecutionException, InterruptedException { //FUNCIONAAAAAAAAAAAAAAAA
+
+
+        Callable<Boolean> callable = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+
+                URL url = new URL("http://sanjuesc.xyz/algo/"+nombre+".jpg");
+                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                MisBitmaps.getInstance().addToArray(bmp);
+                return true;
+            }
+        };
+
+        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable);
+
+        return future.get();
+    }
+
+    public void enviarNoti() throws ExecutionException, InterruptedException {
+        Callable<Boolean> callable = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                Request request = new Request.Builder()
+                        .url("http://sanjuesc.xyz:8888/firebase/notification/"+usuario)
+                        .addHeader("User-Agent", "OkHttp Bot")
+                        .get()
+                        .build();
+
+                try (Response response = httpClient.newCall(request).execute()) {
+
+                    System.out.println(response.body().string());
+                }
+                return true;
+
+            }
+        };
+
+        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable);
+
+        future.get();
+    }
+
+
+
 }
