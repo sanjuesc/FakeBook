@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
+    android:background="#405DE6"
     tools:context=".menu_principal" >
 
     <androidx.recyclerview.widget.RecyclerView
@@ -17,8 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
-
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -52,10 +51,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/baseline_settings_24"
+        app:srcCompat="@drawable/ic_baseline_refresh_24"
         android:onClick="abrirPreferencias"/>
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

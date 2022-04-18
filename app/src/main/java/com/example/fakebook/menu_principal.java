@@ -1,12 +1,14 @@
 package com.example.fakebook;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -64,6 +66,8 @@ public class menu_principal extends AppCompatActivity implements MyRecyclerViewA
         if (extras != null) {
             usuario = extras.getString("usuario");
         }
+
+
 
         setContentView(R.layout.activity_menu_principal);
 

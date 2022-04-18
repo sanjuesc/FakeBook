@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -53,8 +52,6 @@ public class login extends AppCompatActivity {
                     // Get new FCM registration token
                     token = task.getResult();
                     // Log and toast
-                    Log.d("yoyo", token);
-                    Toast.makeText(getApplicationContext(), token, Toast.LENGTH_SHORT).show();
                 });
 
     }
@@ -72,8 +69,6 @@ public class login extends AppCompatActivity {
             finish(); //cerramos esta actividad
             startActivity(i); //y empezamos la nueva
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
-
         }
     }
 
@@ -136,7 +131,7 @@ public class login extends AppCompatActivity {
                 stream.write(out);
                 Log.d("aaa",connection.getResponseCode() + " " + connection.getResponseMessage()); // THis is optional
                 connection.disconnect();
-                return connection.getResponseCode()==200;
+                return connection.getResponseMessage().equals("OK");
             }
         };
 
