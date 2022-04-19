@@ -20,14 +20,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     onMessageReceived(RemoteMessage remoteMessage) {
         String title = remoteMessage.getNotification().getTitle();
         String text = remoteMessage.getNotification().getBody();
-        final String CHANNEL_ID = "HEADS_UP_NOTIFICATION";
+        final String CHANNEL_ID = "HEADS_UP_NOTIFICATION"; //declaramos variables necesarias
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Heads Up Notification",NotificationManager.IMPORTANCE_HIGH);
         getSystemService(NotificationManager.class).createNotificationChannel(channel);
 
         Notification.Builder notification = new Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle(title)
+                .setContentTitle(title) //mostramos el titulo y el texto que hemos obtenido de la notificacion
                 .setContentText(text)
-                .setSmallIcon(R.drawable.gcm_icon)
+                .setSmallIcon(R.drawable.gcm_icon) //icono estandar, tampoco tiene nada de especial
                 .setAutoCancel(true);
         NotificationManagerCompat.from(this).notify(1, notification.build());
         super.onMessageReceived(remoteMessage);

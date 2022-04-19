@@ -43,15 +43,13 @@ public class login extends AppCompatActivity {
         textUsuario.addTextChangedListener(watcher); //obtenemos el campo del usuario y de la contraseña y los añadimos
         textContraseña.addTextChangedListener(watcher); //un listener para que cuando ambos campos sean validos
                                                         //se habilite el boton de login
-        FirebaseMessaging.getInstance().getToken()
+        FirebaseMessaging.getInstance().getToken() //obtenemos el token FCM para poder enviar notificaciones
                 .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.w("yoyo", "Fetching FCM registration token failed", task.getException());
+                    if (!task.isSuccessful()) {//si sale mal logeamos el error
+                        Log.w("Error FCM", "Fetching FCM registration token failed", task.getException());
                         return;
                     }
-                    // Get new FCM registration token
                     token = task.getResult();
-                    // Log and toast
                 });
 
     }
@@ -65,7 +63,7 @@ public class login extends AppCompatActivity {
         String contra = textContraseña.getText().toString(); //obtenemos el usuario y la contraseña introducidas
         if(enviar(usuario, contra)){
             Intent i = new Intent(login.this, menu_principal.class);
-            i.putExtra("usuario", usuario);
+            i.putExtra("usuario", usuario); //le pasamos el nombre del usuario al menu principal
             finish(); //cerramos esta actividad
             startActivity(i); //y empezamos la nueva
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -114,28 +112,27 @@ public class login extends AppCompatActivity {
 
     public Boolean enviar(String usuario, String contra) throws ExecutionException, InterruptedException {
 
-
         Callable<Boolean> callable = new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                URL url = new URL("http://sanjuesc.xyz:8888/user/login");
+                URL url = new URL("http://sanjuesc.xyz:8888/user/login"); //la url donde hay que hacer la peticion
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
+                connection.setRequestMethod("POST"); //tipo de peticion
                 connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type","application/json");
+                connection.setRequestProperty("Content-Type","application/json"); //formato JSON
                 connection.setRequestProperty("Accept", "application/json");
-                String payload = "{\"usuario\":\""+usuario+"\", \"pass\":\""+contra+"\", \"registrationToken\":\""+token+"\"}";// This should be your json body i.e. {"Name" : "Mohsin"}
-                Log.d("aaa", payload);
+                String payload = "{\"usuario\":\""+usuario+"\", \"pass\":\""+contra+"\", \"registrationToken\":\""+token+"\"}"; //el json que se va a enviar (un poco guarro pero sirve)
+                Log.d("payload", payload);
                 byte[] out = payload.getBytes(StandardCharsets.UTF_8);
                 OutputStream stream = connection.getOutputStream();
                 stream.write(out);
-                Log.d("aaa",connection.getResponseCode() + " " + connection.getResponseMessage()); // THis is optional
+                Log.d("connection response",connection.getResponseCode() + " " + connection.getResponseMessage());
                 connection.disconnect();
-                return connection.getResponseMessage().equals("OK");
+                return connection.getResponseMessage().equals("OK"); //devolvemos True si la respuesta es 200 OK
             }
         };
 
-        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable);
+        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable); //lo ejecutamos en un hilo nuevo para no bloquear el de la aplicacion
 
         return future.get();
     }

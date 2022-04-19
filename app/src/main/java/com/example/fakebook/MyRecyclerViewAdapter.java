@@ -42,9 +42,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         holder.myTextView.setText(actual.autor);
         holder.fecha.setText(actual.fecha);
         holder.hora.setText(actual.hora);
-        holder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.cardView.getContext(), R.color.fondo));
+        holder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.cardView.getContext(), R.color.fondo)); //color de fondo de la cardview
         Random random = new Random();
-        switch (random.nextInt(6 - 1 + 1) + 1){
+        switch (random.nextInt(6 - 1 + 1) + 1){ //a cada imagen se le añade una imagen de perfil de manera aleatoria entre las 5 que hay disponible
             case 1:
                 holder.avatar.setImageResource(R.drawable.ic_avatar1_foreground);
                 break;
@@ -121,7 +121,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
 
 
-    public void cargarImagen(String nombre, ImageView imageView, int posicion) throws ExecutionException, InterruptedException { //FUNCIONAAAAAAAAAAAAAAAA
+    public void cargarImagen(String nombre, ImageView imageView, int posicion) throws ExecutionException { //FUNCIONAAAAAAAAAAAAAAAA
         Bitmap bmp = MisBitmaps.getInstance().getArray().get(posicion);
         imageView.setImageBitmap(bmp);
 

@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
-    android:background="#405DE6"
     tools:context=".menu_principal" >
 
     <androidx.recyclerview.widget.RecyclerView

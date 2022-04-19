@@ -82,18 +82,17 @@ public class registrarse extends AppCompatActivity {
 
         EditText textContra = (EditText)findViewById(R.id.editTextPassword);
         String contra = textContra.getText().toString();
-        boolean exito=enviar(usuario, contra);
+        boolean exito=enviar(usuario, contra); //intentamos crear el usuario
 
         Context context = getApplicationContext();
         CharSequence text;
-        if(exito){
+        if(exito){ //y mostramos el mensaje correspondiente al resultado
             text = "Usuario creado correctamente";
         }else{
             text = "No se ha podido crear el usuario";
         }
 
         int duration = Toast.LENGTH_SHORT;
-
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
 
@@ -104,25 +103,23 @@ public class registrarse extends AppCompatActivity {
         Callable<Boolean> callable = new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                URL url = new URL("http://sanjuesc.xyz:8888/user/add");
+                URL url = new URL("http://sanjuesc.xyz:8888/user/add"); //uri donde hay que hacer la peticion
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("PUT");
+                connection.setRequestMethod("PUT"); //tipo de peticion
                 connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type","application/json");
+                connection.setRequestProperty("Content-Type","application/json"); //enviaremos un json
                 connection.setRequestProperty("Accept", "application/json");
-                String payload = "{\"usuario\":\""+usuario+"\", \"pass\":\""+contra+"\"}";// This should be your json body i.e. {"Name" : "Mohsin"}
+                String payload = "{\"usuario\":\""+usuario+"\", \"pass\":\""+contra+"\"}"; //el json de la peticion
                 Log.d("aaa", payload);
                 byte[] out = payload.getBytes(StandardCharsets.UTF_8);
                 OutputStream stream = connection.getOutputStream();
                 stream.write(out);
-                Log.d("aaa",connection.getResponseCode() + " " + connection.getResponseMessage()); // THis is optional
+                Log.d("aaa",connection.getResponseCode() + " " + connection.getResponseMessage());
                 connection.disconnect();
-                return connection.getResponseCode()==200;
+                return connection.getResponseCode()==200; //devolvemos True si la respuesta es 200 OK
             }
         };
-
-        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable);
-
+        Future<Boolean> future = Executors.newSingleThreadExecutor().submit(callable); //lo ejecutamos en un hilo nuevo para no bloquear el de la aplicacion
         return future.get();
     }
 
